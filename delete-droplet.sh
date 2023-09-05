@@ -1,7 +1,13 @@
 #!/bin/bash
 
 # Get the list of running droplets with their names and status
-droplets_output="$(doctl compute droplet list --format "ID,Name,Status" --no-header)"
+droplets_output="$(doctl compute droplet list --format "ID,Name,Status" --no-header | grep -v 'jump-server-1' | grep -v '^347233147')"
+
+# Check if there are any droplets to delete
+if [ -z "$droplets_output" ]; then
+    echo "No droplets to delete."
+    exit 0
+fi
 
 # Check if the doctl command was successful
 if [ $? -eq 0 ]; then
