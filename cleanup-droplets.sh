@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Get the list of all running droplets
-droplets=$(doctl compute droplet list --format "ID,Name,Status" --no-header | grep -v 'jump-server-1' | grep -v '^347233147')
+droplets=$(doctl compute droplet list --format "ID,Name,Status" | grep -e "active\b")
 
 # Check if there are any droplets to delete
 if [ -z "$droplets" ]; then
@@ -25,7 +25,7 @@ while IFS= read -r droplet; do
 
   # Wait for the droplet to shut down
   while true; do
-    status=$(doctl compute droplet get "$droplet_id" --format "Status" --no-header)
+    status=$(doctl compute droplet get "$droplet_id" --format "Status" --no-header --output json | jq -r '.[0].status')
     if [["$status" == "off" ]]; then
       break
     fi
